@@ -1,0 +1,4 @@
+---  
+- name: test de mieterse bende
+  shell: GET localhost/testfile.html | grep hoera
+  shell: GET localhost/testfile.html | grep -v hoera

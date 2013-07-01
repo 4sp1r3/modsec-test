@@ -3,16 +3,13 @@
 
   tasks:
 
-  #~ - name: add percona apt sources
-    #~ template: src=templates/percona.list.j2 dest=/etc/apt/sources.list.d/percona.list 
-    #~ notify: add_percona_keys
-   #~ 
   - name: add some handy packages
     apt: pkg=$item state=installed update_cache=yes
     with_items:
     - libapache-mod-security
     - apache2-mpm-prefork
     - curl
+    - libwww-perl
     
   - name: install modsecurity conf
     copy: src=files/modsecurity.conf dest=/etc/apache2/conf.d/modsecurity.conf owner=root group=root
@@ -21,31 +18,13 @@
     command: a2enmod mod-security
     
   - name: put www files in place
-    copy: src=$item desc=/var/www/
+    copy: src=$item dest=/var/www/
     with_fileglob: files/www/*
+    
+  - name: install upload inspect
+    copy: src=files/byte-webserver-inspect-uploaded-file dest=/usr/sbin/byte-webserver-inspect-uploaded-file mode=755
     
   - name: restart apache
     service: name=apache2 state=restarted
     
-    #~ - copy: src=/srv/myfiles/foo.conf dest=/etc/foo.conf owner=foo group=foo mode=0644
-    #~ 
-  #~ - name: create neccessary dirs
-    #~ file: path=/srv/$item mode=0755 state=directory
-    #~ with_items:
-    #~ - db
-    #~ - logs
-    #~ 
-  #~ - name: create mysql config
-    #~ template: src=templates/my.cnf.j2 dest=/etc/mysql/my.cnf
-    #~ notify: mysql_restart
-    
-  #~ handlers:
-
-  ## This handler should be moved to a task, as currently it is only executed AFTER all the other tasks have run (which is too late)
-  #~ - name: add_percona_keys
-    #~ shell: '/usr/bin/gpg --keyserver  hkp://keys.gnupg.net --recv-keys 1C4CBDCDCD2EFD2A'
-    #~ shell: '/usr/bin/gpg -a --export CD2EFD2A | /usr/bin/apt-key add -'
-    #~ shell: '/usr/bin/apt-get update'
-#~ 
-  #~ - name: mysql_restart
-    #~ service: name=mysql state=reloaded
+  - include: tests.yml
