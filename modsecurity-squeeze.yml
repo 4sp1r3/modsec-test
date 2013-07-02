@@ -10,6 +10,7 @@
     - apache2-mpm-prefork
     - curl
     - libwww-perl
+    - libmime-lite-perl
     
   - name: install modsecurity conf
     copy: src=files/modsecurity.conf dest=/etc/apache2/conf.d/modsecurity.conf owner=root group=root
